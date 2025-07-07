@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Building2, MapPin, Calculator } from "lucide-react";
+import { Plus, Trash2, Building2, MapPin, Calculator, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { expenseCategories } from "@/data/expenseCategories";
 
@@ -104,6 +104,10 @@ export const OrderForm = () => {
   const taxRate = watch('taxRate') || 19;
   const taxAmount = (subtotal + shippingCost) * (taxRate / 100);
   const totalAmount = subtotal + shippingCost + taxAmount;
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const onSubmit = (data: OrderFormData) => {
     const orderData = {
@@ -441,9 +445,13 @@ export const OrderForm = () => {
       </Card>
 
       {/* Submit */}
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end space-x-4 print:hidden">
         <Button type="button" variant="outline">
           Entwurf speichern
+        </Button>
+        <Button type="button" variant="outline" onClick={handlePrint}>
+          <Printer className="w-4 h-4 mr-2" />
+          Drucken
         </Button>
         <Button type="submit" className="bg-gradient-primary">
           Bestellung erstellen

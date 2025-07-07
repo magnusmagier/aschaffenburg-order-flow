@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { CreditCard, Building2, Euro, AlertTriangle } from "lucide-react";
+import { CreditCard, Building2, Euro, AlertTriangle, Printer } from "lucide-react";
 import { toast } from "sonner";
 
 interface VirtualCreditCardFormData {
@@ -47,6 +47,10 @@ export const VirtualCreditCardForm = () => {
   const euRegulationAgreement = watch('euRegulationAgreement');
   const orderingAgreement = watch('orderingAgreement');
   const estimatedAmount = watch('estimatedAmount') || 0;
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   const onSubmit = (data: VirtualCreditCardFormData) => {
     if (!euRegulationAgreement || !orderingAgreement) {
@@ -350,9 +354,13 @@ export const VirtualCreditCardForm = () => {
       </Card>
 
       {/* Submit */}
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end space-x-4 print:hidden">
         <Button type="button" variant="outline">
           Entwurf speichern
+        </Button>
+        <Button type="button" variant="outline" onClick={handlePrint}>
+          <Printer className="w-4 h-4 mr-2" />
+          Drucken
         </Button>
         <Button 
           type="submit" 

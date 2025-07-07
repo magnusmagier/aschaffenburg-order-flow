@@ -117,3 +117,93 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Print Styles */
+@media print {
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: black !important;
+    background: white !important;
+  }
+
+  /* Hide interactive elements */
+  .print\:hidden,
+  button:not(.print\:show),
+  [role="button"],
+  nav,
+  .toast,
+  .sonner-toast-container {
+    display: none !important;
+  }
+
+  /* Optimize cards for print */
+  .border {
+    border: 1px solid #000 !important;
+  }
+
+  /* Ensure proper spacing */
+  .space-y-8 > * + * {
+    margin-top: 1.5rem !important;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  /* Make signature areas more prominent */
+  .border-dashed {
+    border: 2px solid #000 !important;
+    min-height: 3cm !important;
+  }
+
+  /* Ensure all backgrounds are white */
+  * {
+    background: white !important;
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Make important text stand out */
+  .text-university,
+  .text-primary {
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+
+  /* Improve readability of form elements */
+  input,
+  textarea,
+  select {
+    border: 1px solid #000 !important;
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+  }
+
+  /* Page breaks */
+  .break-before-page {
+    page-break-before: always;
+  }
+
+  .break-after-page {
+    page-break-after: always;
+  }
+
+  /* Avoid breaking inside important sections */
+  .break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Header styling for official documents */
+  h1, h2, h3 {
+    color: black !important;
+    font-weight: bold !important;
+    margin-bottom: 0.5rem !important;
+  }
+}
