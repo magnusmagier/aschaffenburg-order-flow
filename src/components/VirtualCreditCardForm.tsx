@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Building2, Euro, AlertTriangle, Printer } from "lucide-react";
 import { toast } from "sonner";
+import { useOrderNumberContext } from "./OrderNumberContext";
 
 interface VirtualCreditCardFormData {
   // Organization Information
@@ -30,6 +31,13 @@ interface VirtualCreditCardFormData {
   // Additional Information
   notes: string;
   requestDate: string;
+  orderNumber: string;
+  responsiblePerson: string;
+  amountNet: number;
+  amountGross: number;
+  orderLink: string;
+  location: string;
+  orderAttached: boolean;
 }
 
 export const VirtualCreditCardForm = () => {
@@ -40,13 +48,21 @@ export const VirtualCreditCardForm = () => {
       deliveryCountry: "deutschland",
       requestDate: new Date().toISOString().split('T')[0],
       euRegulationAgreement: false,
-      orderingAgreement: false
+      orderingAgreement: false,
+      orderNumber: "",
+      responsiblePerson: "",
+      amountNet: 0,
+      amountGross: 0,
+      orderLink: "",
+      location: "",
+      orderAttached: false
     }
   });
 
   const euRegulationAgreement = watch('euRegulationAgreement');
   const orderingAgreement = watch('orderingAgreement');
   const estimatedAmount = watch('estimatedAmount') || 0;
+  const { orderNumber, setOrderNumber } = useOrderNumberContext();
 
   const handlePrint = () => {
     window.print();
@@ -70,284 +86,104 @@ export const VirtualCreditCardForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      {/* Header Information */}
-      <Card className="bg-university-light border-university/20">
+      {/* Kopfbereich als Tabelle */}
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-university">
-            <CreditCard className="w-5 h-5" />
-            Bestellformular "Virtuelle Kreditkarte" für Online-Bestellungen
-          </CardTitle>
-          <CardDescription>
-            Höchstwert: 5000,- EUR
-          </CardDescription>
+          <CardTitle className="text-university">Bestellformular „Virtuelle Kreditkarte“ für Online-Bestellungen</CardTitle>
+          <CardDescription>Höchstwert: 5000,- EUR</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-start gap-4 p-4 bg-warning/10 rounded-lg border border-warning/20">
-            <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Wichtige Hinweise:</p>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Die Bestellung ist EU-Ausland oder Drittland ist unwiderrufbar einer Gst (15-16 Nr 1 VAT Nr 27/2018/29 zumindest).</li>
-                <li>• Das Formular muss gedruckt und unterschrieben werden.</li>
-                <li>• Die Bestellung ist EU-bestellung nur gegen eine gültige Rechnung möglich.</li>
-              </ul>
-            </div>
+          <div className="overflow-x-auto mb-4">
+            <table className="min-w-full border text-sm">
+              <tbody>
+                <tr className="bg-muted">
+                  <td className="border px-2 py-1 w-1/3"><Label>Organisationseinheit / Bestellnummer</Label></td>
+                  <td className="border px-2 py-1 w-1/3"><Label>Sachbearbeitung</Label></td>
+                </tr>
+                <tr>
+                  <td className="border px-2 py-1">
+                    <Input id="organizationUnit" {...register("organizationUnit", { required: "Organisationseinheit ist erforderlich" })} placeholder="z.B. Labor für nutzeradaptive Systeminteraktion" />
+                    <div className="space-y-2">
+                      <Label htmlFor="orderNumber">Bestellnummer</Label>
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          id="orderNumber"
+                          value={orderNumber}
+                          onChange={e => setOrderNumber(e.target.value)}
+                          placeholder="z.B. 25THAxxxxxxxxxxxxxxxxxxxxx"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setOrderNumber(generateUniqueOrderNumber())}
+                        >
+                          Auftragsnummer generieren
+                        </Button>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="border px-2 py-1">
+                    <Input id="responsiblePerson" {...register("responsiblePerson", { required: false })} placeholder="z.B. Max Mustermann" />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Organization Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Building2 className="w-5 h-5 text-university" />
-            Organisationseinheit / Kostenstelle
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="organizationUnit">Organisationseinheit</Label>
-            <Input
-              id="organizationUnit"
-              {...register("organizationUnit", { required: "Organisationseinheit ist erforderlich" })}
-              placeholder="Technische Hochschule Aschaffenburg"
-            />
-            {errors.organizationUnit && (
-              <p className="text-sm text-destructive">{errors.organizationUnit.message}</p>
-            )}
+          {/* Kurzbeschreibung der Leistung */}
+          <div className="mb-4">
+            <Label>Kurzbeschreibung der Leistung</Label>
+            <Textarea id="serviceDescription" {...register("serviceDescription", { required: "Leistungsbeschreibung ist erforderlich" })} placeholder="Beschreibung der zu bestellenden Leistung/Artikel..." rows={2} />
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="costCenter">Kostenstelle</Label>
-            <Input
-              id="costCenter"
-              {...register("costCenter", { required: "Kostenstelle ist erforderlich" })}
-              placeholder="6606105"
-            />
-            {errors.costCenter && (
-              <p className="text-sm text-destructive">{errors.costCenter.message}</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Service Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Euro className="w-5 h-5 text-university" />
-            Leistungsbeschreibung der Leistung
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="serviceDescription">Leistung</Label>
-            <Textarea
-              id="serviceDescription"
-              {...register("serviceDescription", { required: "Leistungsbeschreibung ist erforderlich" })}
-              placeholder="Beschreibung der zu bestellenden Leistung/Artikel..."
-              rows={3}
-            />
-            {errors.serviceDescription && (
-              <p className="text-sm text-destructive">{errors.serviceDescription.message}</p>
-            )}
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Lieferant, Auftragswert netto/brutto, Link */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div className="space-y-2">
               <Label htmlFor="supplier">Lieferant</Label>
-              <Input
-                id="supplier"
-                {...register("supplier", { required: "Lieferant ist erforderlich" })}
-                placeholder="Name des Lieferanten"
-              />
-              {errors.supplier && (
-                <p className="text-sm text-destructive">{errors.supplier.message}</p>
-              )}
+              <Input id="supplier" {...register("supplier", { required: "Lieferant ist erforderlich" })} placeholder="Name des Lieferanten" />
             </div>
-            
             <div className="space-y-2">
-              <Label htmlFor="estimatedAmount">Geschätzter Auftragswert (EUR)</Label>
-              <Input
-                id="estimatedAmount"
-                type="number"
-                step="0.01"
-                max="5000"
-                {...register("estimatedAmount", { 
-                  required: "Auftragswert ist erforderlich",
-                  max: { value: 5000, message: "Maximaler Betrag: 5000 EUR" },
-                  min: { value: 0.01, message: "Betrag muss größer als 0 sein" }
-                })}
-                placeholder="0.00"
-              />
-              {errors.estimatedAmount && (
-                <p className="text-sm text-destructive">{errors.estimatedAmount.message}</p>
-              )}
-              {estimatedAmount > 5000 && (
-                <p className="text-sm text-warning">⚠️ Betrag überschreitet das Limit von 5000 EUR</p>
-              )}
+              <Label htmlFor="amountNet">Auftragswert (netto)</Label>
+              <Input id="amountNet" type="number" step="0.01" {...register("amountNet", { required: "Netto-Betrag ist erforderlich" })} placeholder="0.00" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="amountGross">Auftragswert (brutto)</Label>
+              <Input id="amountGross" type="number" step="0.01" {...register("amountGross", { required: "Brutto-Betrag ist erforderlich" })} placeholder="0.00" />
+            </div>
+            <div className="space-y-2 md:col-span-3">
+              <Label htmlFor="orderLink">Link</Label>
+              <Input id="orderLink" {...register("orderLink", { required: false })} placeholder="z.B. https://shop.de/artikel" />
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Delivery Country */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Lieferung</CardTitle>
-          <CardDescription>
-            Die Bestellung erfolgt in
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="deutschland"
-                  value="deutschland"
-                  {...register("deliveryCountry", { required: true })}
-                  className="w-4 h-4"
-                />
-                <Label htmlFor="deutschland">Deutschland</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="eu-land"
-                  value="eu-land"
-                  {...register("deliveryCountry", { required: true })}
-                  className="w-4 h-4"
-                />
-                <Label htmlFor="eu-land">EU-Land</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="drittland"
-                  value="drittland"
-                  {...register("deliveryCountry", { required: true })}
-                  className="w-4 h-4"
-                />
-                <Label htmlFor="drittland">Drittland</Label>
-              </div>
-            </div>
-            
-            <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong>Wichtiger Hinweis:</strong> Bitte haben Sie den Antragsteller bei der Rechnungsstellung an die Technische Hochschule Aschaffenburg, Würzburger Straße 45, 63743 Aschaffenburg, zu richten ist.
-              </p>
+          {/* Lieferland-Auswahl */}
+          <div className="mb-4">
+            <Label>Die Bestellung erfolgt in</Label>
+            <div className="flex gap-4 mt-2">
+              <label><input type="radio" value="deutschland" {...register("deliveryCountry")} /> Deutschland</label>
+              <label><input type="radio" value="eu" {...register("deliveryCountry")} /> EU-Land</label>
+              <label><input type="radio" value="drittland" {...register("deliveryCountry")} /> Drittland</label>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Legal Agreements */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Rechtliche Vereinbarungen</CardTitle>
-          <CardDescription>
-            Erforderliche Bestätigungen für die Bearbeitung
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="euRegulationAgreement"
-                checked={euRegulationAgreement}
-                onCheckedChange={(checked) => setValue('euRegulationAgreement', !!checked)}
-                className="mt-1"
-              />
-              <div className="space-y-1">
-                <Label htmlFor="euRegulationAgreement" className="text-sm font-medium leading-relaxed">
-                  Die Bestellung von EU-Ausland-oder Drittland ist einwandfrei einer GzT (15-16 Nr 1 VAT Nr 27/2018/29 zumindest). 
-                  Anderweitig ist das auch in EUR (Nr 86/78/75/2 der Bestellung beigefügt).
-                </Label>
+          {/* Hinweise zu USt-ID/EORI */}
+          <div className="text-sm text-warning font-semibold mb-2">Bei Bestellungen im EU-Ausland oder Drittland ist unbedingt immer die USt-ID-Nr (VAT) DE 121098123 anzugeben. Muss die Warenlieferung zollrechtlich behandelt werden, ist auch die EORI-Nr. DE721632 bei der Bestellung anzugeben.</div>
+          {/* Checkbox Bestellung beigefügt */}
+          <div className="flex items-center gap-2 mb-4">
+            <input type="checkbox" id="orderAttached" {...register("orderAttached")}/>
+            <Label htmlFor="orderAttached">Die Bestellung ist beigefügt.</Label>
+          </div>
+          {/* Ort und Unterschriften */}
+          <div className="flex flex-col gap-8 mt-8">
+            <div className="flex flex-col md:flex-row gap-8 justify-between">
+              <div className="flex-1 flex flex-col items-center">
+                <div className="border-b-2 border-muted h-8 w-full mb-1" />
+                <Label className="block text-center mt-1">Unterschrift</Label>
+              </div>
+              <div className="flex-1 flex flex-col items-center">
+                <div className="border-b-2 border-muted h-8 w-full mb-1" />
+                <Label className="block text-center mt-1">Unterschrift Kostenstellenverantwortliche/r</Label>
               </div>
             </div>
-            
-            <div className="flex items-start space-x-3">
-              <Checkbox 
-                id="orderingAgreement"
-                checked={orderingAgreement}
-                onCheckedChange={(checked) => setValue('orderingAgreement', !!checked)}
-                className="mt-1"
-              />
-              <div className="space-y-1">
-                <Label htmlFor="orderingAgreement" className="text-sm font-medium leading-relaxed">
-                  Die Bestellung ist festgelegt.
-                </Label>
-              </div>
-            </div>
-          </div>
-          
-          {(!euRegulationAgreement || !orderingAgreement) && (
-            <div className="p-4 bg-destructive/10 rounded-lg border border-destructive/20">
-              <p className="text-sm text-destructive">
-                ⚠️ Beide Vereinbarungen müssen bestätigt werden, um den Antrag einzureichen.
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Additional Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Zusätzliche Informationen</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="requestDate">Antragsdatum</Label>
-            <Input
-              id="requestDate"
-              type="date"
-              {...register("requestDate", { required: "Antragsdatum ist erforderlich" })}
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="notes">Anmerkung zur Abrechnung/Beantakt</Label>
-            <Textarea
-              id="notes"
-              {...register("notes")}
-              placeholder="Zusätzliche Anmerkungen..."
-              rows={3}
-            />
-          </div>
-          
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Bestellformular „Virtuelle Kreditkarte" für Online-Bestellungen</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Signature Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Unterschrift</CardTitle>
-          <CardDescription>
-            Das Formular muss ausgedruckt und unterschrieben werden
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <Label>Unterschrift</Label>
-              <div className="h-20 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">Unterschrift Kostenstelle/Vorgesetzter/in</span>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <Label>Unterschrift Kostenstellenverantwortliche</Label>
-              <div className="h-20 border-2 border-dashed border-muted-foreground/30 rounded-lg flex items-center justify-center">
-                <span className="text-sm text-muted-foreground">Bei Auftragswert über 1.500€</span>
-              </div>
+            <div className="mt-6">
+              <Label htmlFor="notes">Anmerkung der Abteilung Haushalt</Label>
+              <Textarea id="notes" {...register("notes")} placeholder="..." rows={3} />
             </div>
           </div>
         </CardContent>
@@ -373,3 +209,11 @@ export const VirtualCreditCardForm = () => {
     </form>
   );
 };
+
+// Hilfsfunktion für 25-stellige eindeutige Nummer
+function generateUniqueOrderNumber() {
+  const year = new Date().getFullYear().toString().slice(-2);
+  const department = "THA";
+  const unique = (window.crypto?.randomUUID?.() || Math.random().toString(36).slice(2) + Date.now().toString()).replace(/-/g, '').slice(0, 20);
+  return `${year}${department}${unique}`.slice(0, 25);
+}

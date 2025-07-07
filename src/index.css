@@ -121,89 +121,149 @@ All colors MUST be HSL.
 /* Print Styles */
 @media print {
   @page {
-    margin: 2cm;
+    margin: 1.2cm;
     size: A4;
   }
-
-  body {
-    font-size: 12pt;
-    line-height: 1.4;
-    color: black !important;
-    background: white !important;
+  html, body, table, th, td, label, strong, h1, h2, h3, h4, h5, h6, p, span, div, input, textarea, select {
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 9pt !important;
+    color: #000 !important;
+    background: none !important;
+    font-weight: normal !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
   }
-
-  /* Hide interactive elements */
-  .print\:hidden,
-  button:not(.print\:show),
-  [role="button"],
-  nav,
-  .toast,
-  .sonner-toast-container {
+  .card-title, h1, h2, h3, .CardTitle {
+    font-weight: bold !important;
+    font-size: 10pt !important;
+    margin-top: 0.3em !important;
+    margin-bottom: 0.3em !important;
+    color: #000 !important;
+    background: none !important;
+    letter-spacing: 0.01em !important;
+  }
+  label, .label, .Label {
+    font-weight: bold !important;
+    font-size: 9pt !important;
+    margin-top: 0.15em !important;
+    margin-bottom: 0.15em !important;
+    color: #000 !important;
+    background: none !important;
+  }
+  .placeholder, .text-muted-foreground, .text-xs, .hint, .text-gray-500 {
+    color: #666 !important;
+    font-size: 8pt !important;
+    font-style: italic !important;
+    font-weight: normal !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .card, .Card, .print-card {
+    border: 1px solid #000 !important;
+    border-radius: 0.2em !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    margin-bottom: 0.4em !important;
+    padding: 0.6cm !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    box-sizing: border-box !important;
+  }
+  .card-header, .card-content, .CardHeader, .CardContent {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .signature-block {
+    align-items: flex-start !important;
+  }
+  .signature-block.praesidentin, .signature-block-president, .signature-block-presidentin {
+    align-items: center !important;
+  }
+  .signature-line {
+    border-bottom: 1px solid #000 !important;
+    width: 6cm !important;
+    height: 0.5cm !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    margin-bottom: 0.1cm !important;
+  }
+  body, .outermost, .card {
+    padding-right: 1.2cm !important;
+    /* Optional: auch links erhöhen, falls nötig */
+  }
+  table, .print-no-border {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 9pt !important;
+    margin-bottom: 0.1em !important;
+    page-break-inside: auto !important;
+    border: none !important;
+  }
+  .print-no-border th, .print-no-border td {
+    padding-left: 0.4cm !important;
+    padding-right: 0.4cm !important;
+  }
+  .print-no-border th {
+    font-weight: bold !important;
+    font-size: 9pt !important;
+    padding-top: 0.2em !important;
+    padding-bottom: 0.2em !important;
+  }
+  input, textarea, select {
+    border: none !important;
+    background: none !important;
+    color: #000 !important;
+    font-size: 9pt !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .print\:hidden, button, [role="button"], nav, .toast, .sonner-toast-container, img, .logo, .university-logo, .print-logo, .icon, svg {
     display: none !important;
   }
-
-  /* Optimize cards for print */
-  .border {
-    border: 1px solid #000 !important;
+  .space-y-8 > * + * { margin-top: 0.2em !important; }
+  .space-y-4 > * + * { margin-top: 0.1em !important; }
+  .border, .border-b-2, .border-muted { border-color: #000 !important; }
+  .bg-muted, .bg-background, .bg-primary, .bg-secondary, .bg-accent, .bg-university { background: #fff !important; }
+  table.print-no-border, .print-no-border th, .print-no-border td {
+    width: auto !important;
+    text-align: left !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
-
-  /* Ensure proper spacing */
-  .space-y-8 > * + * {
-    margin-top: 1.5rem !important;
+  .print-block, .print-flex {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
-
-  .space-y-4 > * + * {
-    margin-top: 0.75rem !important;
+  .print\:px-0, .print\:ml-0, .print\:mr-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
   }
-
-  /* Make signature areas more prominent */
-  .border-dashed {
-    border: 2px solid #000 !important;
-    min-height: 3cm !important;
+  .card > *, .Card > *, .print-card > *, .print-block, .print-flex, table.print-no-border {
+    padding-left: 0.4cm !important;
+    padding-right: 0.4cm !important;
   }
-
-  /* Ensure all backgrounds are white */
-  * {
-    background: white !important;
-    -webkit-print-color-adjust: exact !important;
-    color-adjust: exact !important;
+  .card.outermost, .Card.outermost, .print-card.outermost,
+  .card.outermost > *, .Card.outermost > *, .print-card.outermost > * {
+    border: none !important;
+    border-radius: 0 !important;
   }
-
-  /* Make important text stand out */
-  .text-university,
-  .text-primary {
-    color: #000 !important;
-    font-weight: bold !important;
+  .outermost {
+    border: none !important;
+    box-shadow: none !important;
   }
+}
 
-  /* Improve readability of form elements */
-  input,
-  textarea,
-  select {
-    border: 1px solid #000 !important;
-    background: white !important;
-    color: black !important;
-    font-size: 11pt !important;
-  }
-
-  /* Page breaks */
-  .break-before-page {
-    page-break-before: always;
-  }
-
-  .break-after-page {
-    page-break-after: always;
-  }
-
-  /* Avoid breaking inside important sections */
-  .break-inside-avoid {
-    page-break-inside: avoid;
-  }
-
-  /* Header styling for official documents */
-  h1, h2, h3 {
-    color: black !important;
-    font-weight: bold !important;
-    margin-bottom: 0.5rem !important;
-  }
+.signature-line {
+  border-bottom: 1px solid #000;
+  width: 6cm;
+  height: 0.5cm;
+  margin-bottom: 0.1cm;
 }
